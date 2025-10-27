@@ -15,3 +15,8 @@ build/
 
 # Docker
 *.log
+
+# Testing
+coverage/
+*.lcov
+.nyc_output/
