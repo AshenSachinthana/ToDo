@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Toast from './Toast';
 
 const mockOnClose = jest.fn();
@@ -178,23 +177,23 @@ describe('Toast Component', () => {
 
   // Test 11: Success toast has correct styling classes
   it('should apply success styling classes', () => {
-    const { container } = render(
-      <Toast
-        id="toast-1"
-        message="Success message"
-        type="success"
-        onClose={mockOnClose}
-      />
-    );
+  render( 
+    <Toast
+      id="toast-1"
+      message="Success message"
+      type="success"
+      onClose={mockOnClose}
+    />
+  );
 
-    const toastElement = screen.getByRole('alert');
-    expect(toastElement).toHaveClass('bg-green-50');
-    expect(toastElement).toHaveClass('border-green-500');
-  });
+  const toastElement = screen.getByRole('alert');
+  expect(toastElement).toHaveClass('bg-green-50');
+  expect(toastElement).toHaveClass('border-green-500');
+});
 
   // Test 12: Error toast has correct styling classes
   it('should apply error styling classes', () => {
-    const { container } = render(
+    render( 
       <Toast
         id="toast-1"
         message="Error message"
