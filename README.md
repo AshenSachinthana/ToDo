@@ -47,7 +47,7 @@ Full stack todo application built with NestJS, React, PostgreSQL, and Sequelize 
 
 3. **Run the application**
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
    - First build may take a few minutes as it downloads images and installs dependencies
    - Subsequent runs will be faster using cached layers
@@ -60,12 +60,12 @@ Full stack todo application built with NestJS, React, PostgreSQL, and Sequelize 
 
 **Stop the application:**
 ```bash
-docker-compose down
+docker compose down
 ```
 
 **Stop and remove volumes (clears database):**
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ## 📁 Project Structure
