@@ -1,0 +1,172 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Run unit tests
+        working-directory: ./backend
+        run: npm test
+      
+      - name: Generate coverage report
+        working-directory: ./backend
+        run: npm run test:cov
+      
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+      
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm test
+      
+      - name: Generate coverage report
+        working-directory: ./frontend
+        run: npm run test:coverage
+      
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+  docker-build:
+    name: Docker Build & Package
+    runs-on: ubuntu-latest
+    needs: [backend-ci, frontend-ci]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and save backend image
+        working-directory: ./backend
+        run: |
+          docker build -t todo-backend:latest .
+          docker save todo-backend:latest -o /tmp/backend-image.tar
+      
+      - name: Build and save frontend image
+        working-directory: ./frontend
+        run: |
+          docker build -t todo-frontend:latest .
+          docker save todo-frontend:latest -o /tmp/frontend-image.tar
+      
+      - name: Upload Docker images
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: |
+            /tmp/backend-image.tar
+            /tmp/frontend-image.tar
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Oracle VM
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download Docker images
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+          path: /tmp
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Copy files to VM
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "mkdir -p ~/app"
+          scp -i ~/.ssh/id_rsa /tmp/backend-image.tar ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/app/
+          scp -i ~/.ssh/id_rsa /tmp/frontend-image.tar ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/app/
+          scp -i ~/.ssh/id_rsa docker-compose.yml ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/app/
+          scp -i ~/.ssh/id_rsa -r backend ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/app/ || true
+          scp -i ~/.ssh/id_rsa -r frontend ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:~/app/ || true
+      
+      - name: Deploy on VM
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            cd ~/app
+            
+            # Load Docker images
+            docker load < backend-image.tar
+            docker load < frontend-image.tar
+            
+            # Stop existing containers
+            docker compose down
+            
+            # Start new containers
+            docker compose up -d
+            
+            # Wait for containers to start
+            sleep 10
+            
+            # Clean up
+            rm -f backend-image.tar frontend-image.tar
+            docker image prune -f
+            
+            # Show running containers
+            echo "================================"
+            echo "Deployment completed!"
+            echo "================================"
+            docker compose ps
+            
+            # Show container logs
+            docker compose logs --tail=50
+          EOF
