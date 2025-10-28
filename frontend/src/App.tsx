@@ -105,12 +105,13 @@ function App() {
     <div className="relative flex min-h-screen w-full flex-col">
       <div className="layout-container flex h-full grow flex-col">
         {/* Header */}
-        <header className="w-full bg-gradient-to-r from-[#2563EB] to-[#60A5FA] py-8 shadow-md">
+        <header data-testid="app-header" className="w-full bg-gradient-to-r from-[#2563EB] to-[#60A5FA] py-8 shadow-md">
           <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 px-6 sm:flex-row sm:items-center">
             <h1 className="text-white text-4xl font-black tracking-tighter">Task Manager</h1>
             <div className="flex items-center gap-3">
               {/* Dark Mode Toggle */}
               <button
+                data-testid="dark-mode-toggle"
                 onClick={toggleDarkMode}
                 className="flex items-center justify-center rounded-lg h-12 w-12 bg-white/20 hover:bg-white/30 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600"
                 aria-label="Toggle dark mode"
@@ -122,6 +123,7 @@ function App() {
 
               {/* Add Task Button */}
               <button
+                data-testid="add-task-button"
                 onClick={() => setShowForm(!showForm)}
                 className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-white text-[#2563EB] text-base font-bold leading-normal tracking-wide shadow-sm transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-offset-[#111721]"
               >

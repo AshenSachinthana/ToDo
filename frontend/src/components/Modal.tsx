@@ -36,10 +36,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
 
   return (
     <div
+      data-testid="modal-overlay"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
       onClick={onClose}
     >
       <div
+        data-testid="modal-content"
         className="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slideUp"
         onClick={(e) => e.stopPropagation()}
       >
@@ -50,6 +52,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
               {title}
             </h2>
             <button
+              data-testid="modal-close-button"
               onClick={onClose}
               className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
               aria-label="Close modal"

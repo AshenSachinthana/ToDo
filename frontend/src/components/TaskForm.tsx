@@ -51,12 +51,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel }) => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form data-testid="task-form" onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-sm font-medium text-[#6B7280] dark:text-zinc-400 mb-2">
             Task Title <span className="text-red-500">*</span>
           </label>
           <input
+            data-testid="task-title-input"
             type="text"
             placeholder="Enter task title..."
             value={title}
@@ -79,6 +80,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel }) => {
             Task Description <span className="text-red-500">*</span>
           </label>
           <textarea
+            data-testid="task-description-input"
             placeholder="Add details about this task..."
             value={description}
             onChange={handleDescriptionChange}
@@ -98,6 +100,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel }) => {
         </div>
         <div className="flex justify-end gap-3 pt-4">
           <button
+            data-testid="task-form-cancel-button"
             type="button"
             onClick={onCancel}
             className="px-6 py-3 bg-gray-100 dark:bg-zinc-800 text-[#6B7280] dark:text-zinc-300 font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-zinc-900"
@@ -105,6 +108,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, onCancel }) => {
             Cancel
           </button>
           <button
+            data-testid="task-form-submit-button"
             type="submit"
             className="px-6 py-3 bg-gradient-to-r from-[#2563EB] to-[#60A5FA] text-white font-semibold rounded-lg hover:from-[#1e40af] hover:to-[#3b82f6] transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 dark:focus:ring-offset-zinc-900 flex items-center gap-2"
           >

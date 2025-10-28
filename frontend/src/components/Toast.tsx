@@ -40,6 +40,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onClose, duration = 30
 
   return (
     <div
+      data-testid="toast"
       className={`flex items-center gap-3 min-w-[320px] max-w-md p-4 rounded-lg shadow-lg border-l-4 ${style.bg} ${style.border} animate-slideInRight`}
       role="alert"
     >
@@ -50,6 +51,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onClose, duration = 30
         {message}
       </p>
       <button
+        data-testid="toast-close-button"
         onClick={() => onClose(id)}
         className={`${style.text} hover:opacity-70 transition-opacity`}
         aria-label="Close notification"
