@@ -48,25 +48,19 @@ export class TaskService {
 
   async markAsCompleted(id: number): Promise<Task> {
     this.logger.log(`Marking task with ID ${id} as completed`);
-    try {
-      const task = await this.taskModel.findByPk(id);
-      if (!task) {
-        this.logger.warn(`Task with ID ${id} not found`);
-        throw new NotFoundException(`Task with ID ${id} not found`);
-      }
-
-      await task.update({
-        IsCompleted: true,
-        UpdatedAt: new Date(),
-      });
-
-      await task.reload();
-
-      this.logger.log(`Successfully marked task with ID ${id} as completed`);
-      return task;
-    } catch (error) {
-      this.logger.error(`Failed to mark task as completed: ${error.message}`, error.stack);
-      throw new Error(`Failed to mark task as completed: ${error.message}`);
+    
+    const task = await this.taskModel.findByPk(id);
+    if (!task) {
+      this.logger.warn(`Task with ID ${id} not found`);
+      throw new NotFoundException(`Task with ID ${id} not found`);
     }
+    
+    await task.update({
+      IsCompleted: true,
+      UpdatedAt: new Date(),
+    });
+    await task.reload();
+    this.logger.log(`Successfully marked task with ID ${id} as completed`);
+    return task;
   }
 }
