@@ -4,7 +4,7 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './task.model';
 import { Response } from 'express';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -226,8 +226,24 @@ describe('TaskController', () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     });
 
-    it('should handle errors and return 500', async () => {
-      const errorMessage = 'Task not found';
+    it('should handle NotFoundException and return 404', async () => {
+      const errorMessage = 'Task with ID 1 not found';
+      mockTaskService.markAsCompleted.mockRejectedValue(new NotFoundException(errorMessage));
+
+      const res = mockResponse();
+      await controller.markAsCompleted(res, taskId);
+
+      expect(service.markAsCompleted).toHaveBeenCalledWith(1);
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      expect(res.send).toHaveBeenCalledWith({
+        statusCode: 404,
+        message: errorMessage,
+        timestamp: expect.any(String),
+      });
+    });
+
+    it('should handle generic errors and return 500', async () => {
+      const errorMessage = 'Database connection failed';
       mockTaskService.markAsCompleted.mockRejectedValue(new Error(errorMessage));
 
       const res = mockResponse();

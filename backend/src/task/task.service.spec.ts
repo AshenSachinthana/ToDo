@@ -221,11 +221,14 @@ describe('TaskService', () => {
       expect(task.reload).toHaveBeenCalled();
     });
 
-    it('should throw error when task ID does not exist', async () => {
+    it('should throw NotFoundException when task ID does not exist', async () => {
       mockTaskModel.findByPk.mockResolvedValue(null);
 
       await expect(service.markAsCompleted(999)).rejects.toThrow(
-        'Failed to mark task as completed: Task with ID 999 not found',
+        NotFoundException,
+      );
+      await expect(service.markAsCompleted(999)).rejects.toThrow(
+        'Task with ID 999 not found',
       );
       expect(mockTaskModel.findByPk).toHaveBeenCalledWith(999);
     });
@@ -237,7 +240,7 @@ describe('TaskService', () => {
       task.update.mockRejectedValue(new Error(errorMessage));
 
       await expect(service.markAsCompleted(taskId)).rejects.toThrow(
-        `Failed to mark task as completed: ${errorMessage}`,
+        errorMessage,
       );
     });
 
@@ -245,7 +248,10 @@ describe('TaskService', () => {
       mockTaskModel.findByPk.mockResolvedValue(null);
 
       await expect(service.markAsCompleted(taskId)).rejects.toThrow(
-        `Failed to mark task as completed: Task with ID ${taskId} not found`,
+        NotFoundException,
+      );
+      await expect(service.markAsCompleted(taskId)).rejects.toThrow(
+        `Task with ID ${taskId} not found`,
       );
     });
 
@@ -255,7 +261,7 @@ describe('TaskService', () => {
       task.update.mockRejectedValue(new Error('Concurrent update conflict'));
 
       await expect(service.markAsCompleted(taskId)).rejects.toThrow(
-        'Failed to mark task as completed: Concurrent update conflict',
+        'Concurrent update conflict',
       );
     });
 

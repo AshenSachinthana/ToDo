@@ -9,6 +9,7 @@ import {
   Res,
   HttpStatus,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -88,6 +89,13 @@ export class TaskController {
         data,
       });
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        return res.status(HttpStatus.NOT_FOUND).send({
+          statusCode: 404,
+          message: error.message,
+          timestamp: new Date().toISOString(),
+        });
+      }
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         code: '500',
         message: 'Failed to mark task as completed',

@@ -32,7 +32,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onComplete }) => {
 
   return (
     <>
-      <div className="flex items-center gap-4 rounded-xl bg-white dark:bg-zinc-900/50 p-4 shadow-sm border-l-4 border-[#2563EB] dark:border-blue-400 dark:border dark:border-l-4 hover:shadow-md transition-shadow duration-200">
+      <div data-testid="task-item" className="flex items-center gap-4 rounded-xl bg-white dark:bg-zinc-900/50 p-4 shadow-sm border-l-4 border-[#2563EB] dark:border-blue-400 dark:border dark:border-l-4 hover:shadow-md transition-shadow duration-200">
         {/* Left section - Task content */}
         <div className="flex-1">
           <p className="text-lg font-bold text-[#1F2937] dark:text-gray-200">
@@ -49,6 +49,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onComplete }) => {
         {/* Right section - Done button */}
         {!task.IsCompleted && (
           <button
+            data-testid="task-done-button"
             onClick={() => setShowConfirmation(true)}
             className="flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold text-[#6B7280] dark:text-zinc-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-[#111721]"
           >
@@ -88,12 +89,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onComplete }) => {
           </div>
           <div className="flex gap-3 justify-end">
             <button
+              data-testid="task-confirm-cancel-button"
               onClick={() => setShowConfirmation(false)}
               className="px-5 py-2.5 rounded-lg font-semibold text-[#6B7280] dark:text-zinc-300 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-offset-zinc-900"
             >
               Cancel
             </button>
             <button
+              data-testid="task-confirm-complete-button"
               onClick={() => {
                 onComplete(task.Id);
                 setShowConfirmation(false);
